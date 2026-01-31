@@ -1,6 +1,7 @@
+import { readTestFiles } from "./src/file-reader";
 
 function main() {
-  console.log("main function");
+  console.log(readTestFiles());
 }
 
 main();
