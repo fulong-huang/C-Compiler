@@ -74,13 +74,17 @@ function getNextToken(): TOKEN {
 }
 
 export default function lexer(content: string): Array<TOKEN> {
+  console.log();
+  console.log("=====================");
   console.log("NEW LEXER");
+  console.log("=====================");
   const result: Array<TOKEN> = [];
   txt = content;
+  console.log("=====================");
+  console.log("INPUT: ", txt);
   currIdx = 0;
   while (currIdx < txt.length) {
-    let currToken = getNextToken();
-    console.log(currToken);
+    result.push(getNextToken());
   }
   return result;
 }

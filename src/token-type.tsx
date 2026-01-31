@@ -1,14 +1,14 @@
 export const enum TOKEN_TYPES {
   IDENTIFIER, LPAREN, RPAREN, INTEGER, OPERATOR,
 
-  EOF, UNKNOWN
+  EOF, UNKNOWN, ERROR
 }
 
 export default class TOKEN {
-  token: TOKEN_TYPES;
+  TYPE: TOKEN_TYPES;
   value: string;
-  constructor(token: TOKEN_TYPES, value: string) {
-    this.token = token;
+  constructor(type: TOKEN_TYPES, value: string) {
+    this.TYPE = type;
     this.value = value;
   }
 }
