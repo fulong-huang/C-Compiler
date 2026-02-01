@@ -1,9 +1,5 @@
-import TOKEN, { TOKEN_TYPES } from "./token-type";
-
-const SPECIAL_CHARS: Array<string> = [
-  '=',
-];
-
+import { createToken, TOKEN_TYPES } from "./token-type";
+import type { TOKEN } from "./token-type";
 
 let txt: string;
 let currIdx: number;
@@ -41,33 +37,33 @@ function getNextToken(): TOKEN {
   while (currChar == ' ' || currChar == '\n') {
     currIdx++;
     if (currIdx >= txt.length) {
-      return new TOKEN(TOKEN_TYPES.EOF, "EOF");
+      return createToken(TOKEN_TYPES.EOF, "EOF");
     }
     currChar = txt[currIdx];
   }
   if (currChar == '(') {
-    result = new TOKEN(TOKEN_TYPES.LPAREN, '(');
+    result = createToken(TOKEN_TYPES.LPAREN, '(');
     currIdx++;
   }
   else if (currChar == ')') {
-    result = new TOKEN(TOKEN_TYPES.RPAREN, ')');
+    result = createToken(TOKEN_TYPES.RPAREN, ')');
     currIdx++;
   }
   else if (currChar >= '0' && currChar <= '9') {
     let intStr = getInteger();
-    result = new TOKEN(TOKEN_TYPES.INTEGER, intStr);
+    result = createToken(TOKEN_TYPES.INTEGER, intStr);
   }
   else if ((currChar >= 'a' && currChar <= 'z') || currChar >= 'A' && currChar <= 'Z') {
     let intStr = getIdentifier();
-    result = new TOKEN(TOKEN_TYPES.INTEGER, intStr);
+    result = createToken(TOKEN_TYPES.INTEGER, intStr);
   }
   else if (currChar == '+' || currChar == '-' ||
     currChar == '*' || currChar == '/') {
-    result = new TOKEN(TOKEN_TYPES.OPERATOR, currChar);
+    result = createToken(TOKEN_TYPES.OPERATOR, currChar);
     currIdx++;
   }
   else {
-    result = new TOKEN(TOKEN_TYPES.UNKNOWN, currChar);
+    result = createToken(TOKEN_TYPES.UNKNOWN, currChar);
     currIdx++;
   }
   return result;

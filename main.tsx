@@ -1,5 +1,5 @@
 import { readTestFiles } from "./src/file-reader";
-import TOKEN from "./src/token-type";
+import type { TOKEN } from "./src/token-type";
 import lexer from "./src/lexer";
 import parser from "./src/parser";
 

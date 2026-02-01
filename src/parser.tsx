@@ -1,4 +1,5 @@
-import TOKEN, { TOKEN_TYPES } from "./token-type"
+import { createToken, TOKEN_TYPES } from "./token-type"
+import type { TOKEN } from "./token-type";
 
 let CURR_TOKENS: Array<TOKEN>;
 let CURR_TOKEN_IDX: number;
@@ -6,7 +7,7 @@ let CURR_TOKEN_IDX: number;
 function getCurrToken(): TOKEN {
   if (CURR_TOKEN_IDX >= CURR_TOKENS.length) {
     console.error("EXPECTING TOKEN");
-    return new TOKEN(TOKEN_TYPES.ERROR, "ERROR, EXPECTING TOKEN");
+    return createToken(TOKEN_TYPES.ERROR, "ERROR, EXPECTING TOKEN");
   }
   return CURR_TOKENS[CURR_TOKEN_IDX];
 }
@@ -108,7 +109,6 @@ function expression(): number {
   console.log("RETURN EXPRESSION");
   return lhs;
 }
-
 
 
 export default function parser(tokens: Array<TOKEN>) {

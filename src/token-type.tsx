@@ -4,14 +4,15 @@ export const enum TOKEN_TYPES {
   EOF, UNKNOWN, ERROR
 }
 
-export default class TOKEN {
+export interface TOKEN {
   TYPE: TOKEN_TYPES;
   value: string;
-  constructor(type: TOKEN_TYPES, value: string) {
-    this.TYPE = type;
-    this.value = value;
-  }
 }
+
+export function createToken(type: TOKEN_TYPES, value: string): TOKEN {
+  return { TYPE: type, value: value };
+}
+
 
 
 
