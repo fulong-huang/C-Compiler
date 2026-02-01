@@ -1,6 +1,11 @@
 import { createToken, TOKEN_TYPES } from "./token-type";
 import type { TOKEN } from "./token-type";
 
+const KEYWORDS: Array<string> = [
+  "int", "return", "print",
+];
+
+
 let txt: string;
 let currIdx: number;
 
@@ -49,13 +54,30 @@ function getNextToken(): TOKEN {
     result = createToken(TOKEN_TYPES.RPAREN, ')');
     currIdx++;
   }
+  else if (currChar == ';') {
+    result = createToken(TOKEN_TYPES.SEMICOLON, ';');
+    currIdx++;
+  }
+  else if (currChar == '=') {
+    result = createToken(TOKEN_TYPES.ASSIGNMENT, '=');
+    currIdx++;
+    //  RelOp, not there yet
+    //     if(currChar == '='){
+    // 
+    //     }
+  }
   else if (currChar >= '0' && currChar <= '9') {
     let intStr = getInteger();
     result = createToken(TOKEN_TYPES.INTEGER, intStr);
   }
   else if ((currChar >= 'a' && currChar <= 'z') || currChar >= 'A' && currChar <= 'Z') {
-    let intStr = getIdentifier();
-    result = createToken(TOKEN_TYPES.INTEGER, intStr);
+    let ident = getIdentifier();
+    if (KEYWORDS.includes(ident)) {
+      result = createToken(TOKEN_TYPES.KEYWORD, ident);
+    }
+    else {
+      result = createToken(TOKEN_TYPES.IDENTIFIER, ident);
+    }
   }
   else if (currChar == '+' || currChar == '-' ||
     currChar == '*' || currChar == '/') {
@@ -76,8 +98,10 @@ export default function lexer(content: string): Array<TOKEN> {
   console.log("=====================");
   const result: Array<TOKEN> = [];
   txt = content;
+  console.log("\tINPUT: ");
+  console.log(txt);
   console.log("=====================");
-  console.log("INPUT: ", txt);
+  console.log();
   currIdx = 0;
   while (currIdx < txt.length) {
     result.push(getNextToken());
