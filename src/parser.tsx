@@ -13,6 +13,10 @@ function getCurrToken(): TOKEN {
   return CURR_TOKENS[CURR_TOKEN_IDX];
 }
 
+function printRemainingToken() {
+  console.log(CURR_TOKENS.slice(CURR_TOKEN_IDX));
+}
+
 function eatToken(): undefined {
   CURR_TOKEN_IDX++;
 }
@@ -64,6 +68,7 @@ function factor(): number {
   else {
     console.error("Expecting expression, got: ", currToken.value, " instead");
     eatToken();
+    printRemainingToken();
   }
   return result;
 }
@@ -134,15 +139,21 @@ function declaration(): undefined {
   let ident = identifier();
 
   currToken = getCurrToken();
-  if (currToken.TYPE != TOKEN_TYPES.ASSIGNMENT) {
+  if (currToken.TYPE == TOKEN_TYPES.SEMICOLON) {
+    // Variable declared but not defined;
+    let variable: Variable = createVariable(0, false);
+    insertVT(ident, variable);
+  }
+  else if (currToken.TYPE == TOKEN_TYPES.ASSIGNMENT) {
+    // Got assignment char, now evaluate expression;
+    eatToken();
+    let value: number = expression();
+    let variable: Variable = createVariable(value, false);
+    insertVT(ident, variable);
+  }
+  else {
     console.error("Expecting Assignment '=', got: ", currToken.TYPE);
   }
-  eatToken();
-
-  // Got assignment char, now evaluate expression;
-  let value: number = expression();
-  let variable: Variable = createVariable(value, false);
-  insertVT(ident, variable);
 }
 
 function assignment(): undefined {
