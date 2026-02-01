@@ -180,25 +180,30 @@ function assignment(): undefined {
   insertVT(ident, variable);
 }
 
+function printStatement(): undefined {
+  // eat 'printf' token
+  eatToken();
+  let currToken: TOKEN = getCurrToken();
+  if (currToken.TYPE != TOKEN_TYPES.LPAREN) {
+    console.error("Expecting '(', got: ", currToken, " instead");
+  }
+  eatToken();
+  console.log("PRINTING EXPRESSION: ", expression());
+
+  currToken = getCurrToken();
+  if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
+    console.error("Expecting ')', got: ", currToken.value, " instead");
+  }
+}
+
 function statement(): undefined {
   let currToken = getCurrToken();
   if (currToken.TYPE == TOKEN_TYPES.KEYWORD) {
     if (currToken.value == 'int') {
       declaration();
     }
-    else if (currToken.value == 'print') {
-      eatToken();
-      currToken = getCurrToken();
-      if (currToken.TYPE != TOKEN_TYPES.LPAREN) {
-        console.error("Expecting '(', got: ", currToken, " instead");
-      }
-      eatToken();
-      console.log("PRINTING EXPRESSION: ", expression());
-
-      currToken = getCurrToken();
-      if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
-        console.error("Expecting ')', got: ", currToken.value, " instead");
-      }
+    else if (currToken.value == 'printf') {
+      printStatement();
     }
   }
   else if (currToken.TYPE == TOKEN_TYPES.IDENTIFIER) {

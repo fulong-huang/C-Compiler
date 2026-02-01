@@ -2,7 +2,7 @@ import { createToken, TOKEN_TYPES } from "./token-type";
 import type { TOKEN } from "./token-type";
 
 const KEYWORDS: Array<string> = [
-  "int", "return", "print",
+  "int", "return", "printf",
 ];
 
 
