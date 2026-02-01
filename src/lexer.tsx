@@ -54,6 +54,10 @@ function getNextToken(): TOKEN {
     result = createToken(TOKEN_TYPES.RPAREN, ')');
     currIdx++;
   }
+  else if (currChar == ',') {
+    result = createToken(TOKEN_TYPES.COMMA, ',');
+    currIdx++;
+  }
   else if (currChar == ';') {
     result = createToken(TOKEN_TYPES.SEMICOLON, ';');
     currIdx++;

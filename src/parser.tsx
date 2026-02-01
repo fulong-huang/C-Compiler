@@ -187,12 +187,27 @@ function printStatement(): undefined {
   if (currToken.TYPE != TOKEN_TYPES.LPAREN) {
     console.error("Expecting '(', got: ", currToken, " instead");
   }
+  console.log("PRINT STATEMENT");
   eatToken();
-  console.log("PRINTING EXPRESSION: ", expression());
-
   currToken = getCurrToken();
   if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
-    console.error("Expecting ')', got: ", currToken.value, " instead");
+    let args: Array<number> = [];
+    args.push(expression());
+    currToken = getCurrToken();
+    while (currToken.TYPE == TOKEN_TYPES.COMMA) {
+      eatToken();
+      args.push(expression());
+      currToken = getCurrToken();
+    }
+    if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
+      console.error("Expecting ')', got: ", currToken.value, " instead");
+    }
+    eatToken();
+    console.log("Print statement: ", args.join(' '));
+  }
+  else {
+    eatToken();
+    console.log("Print Statement Empty Line");
   }
 }
 
