@@ -1,0 +1,7 @@
+int a = 2;
+printf(a);
+int newFunc(int a, int b);
+int noParam();
+void noReturn(int x);
+void noReturnNoParam();
+

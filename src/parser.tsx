@@ -1,9 +1,11 @@
 import { createToken, TOKEN_TYPES } from "./token-type"
 import type { TOKEN } from "./token-type";
-import { createVariable, getVT, insertVT, printVT, Variable } from "./value-table";
+import { createParam, createVariable, getVT, insertVT, Param, printVT, Variable } from "./value-table";
 
 let CURR_TOKENS: Array<TOKEN>;
 let CURR_TOKEN_IDX: number;
+
+const TYPES: Array<string> = ["int", "void"];
 
 function getCurrToken(): TOKEN {
   if (CURR_TOKEN_IDX >= CURR_TOKENS.length) {
@@ -19,6 +21,21 @@ function printRemainingToken() {
 
 function eatToken(): undefined {
   CURR_TOKEN_IDX++;
+}
+
+function typeName(): string {
+  let currToken = getCurrToken();
+  eatToken();
+  if (currToken.TYPE == TOKEN_TYPES.KEYWORD) {
+    let typeName = currToken.value;
+    if (!TYPES.includes(typeName)) {
+      console.error("Unknown Type Name: ", typeName);
+    }
+    else {
+      return typeName;
+    }
+  }
+  return "";
 }
 
 function identifier(): string {
@@ -126,6 +143,46 @@ function expression(): number {
   }
   return lhs;
 }
+function functionDeclaration(funcName: string): undefined {
+  let currToken = getCurrToken();
+  let params = param();
+  currToken = getCurrToken();
+  console.log("GOT FUNCTION: ", funcName);
+  console.log("PARANS: ", params);
+}
+
+function param(): Array<Param> {
+  let params: Array<Param> = [];
+  let currToken: TOKEN = getCurrToken();
+  if (currToken.TYPE != TOKEN_TYPES.LPAREN) {
+    console.error("Expecting '(', got: ", currToken, " instead");
+  }
+  eatToken();
+
+  currToken = getCurrToken();
+  if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
+    let paramType = typeName();
+    let paramName = identifier();
+    console.log("PARAM: ", paramType, paramName);
+    let currParam = createParam(paramName, paramType);
+    params.push(currParam);
+    currToken = getCurrToken();
+    while (currToken.TYPE == TOKEN_TYPES.COMMA) {
+      eatToken();
+      paramType = typeName();
+      paramName = identifier();
+      currParam = createParam(paramName, paramType);
+      params.push(currParam);
+      currToken = getCurrToken();
+    }
+    // eat ')'
+    eatToken();
+  }
+  else {
+    eatToken();
+  }
+  return params;
+}
 
 function declaration(): undefined {
   // example: 
@@ -143,6 +200,7 @@ function declaration(): undefined {
     // Variable declared but not defined;
     let variable: Variable = createVariable(0, false);
     insertVT(ident, variable);
+    console.log("end of statement");
   }
   else if (currToken.TYPE == TOKEN_TYPES.ASSIGNMENT) {
     // Got assignment char, now evaluate expression;
@@ -150,6 +208,9 @@ function declaration(): undefined {
     let value: number = expression();
     let variable: Variable = createVariable(value, false);
     insertVT(ident, variable);
+  }
+  else if (currToken.TYPE == TOKEN_TYPES.LPAREN) {
+    functionDeclaration(ident);
   }
   else {
     console.error("Expecting Assignment '=', got: ", currToken.TYPE);
@@ -214,11 +275,11 @@ function printStatement(): undefined {
 function statement(): undefined {
   let currToken = getCurrToken();
   if (currToken.TYPE == TOKEN_TYPES.KEYWORD) {
-    if (currToken.value == 'int') {
-      declaration();
-    }
-    else if (currToken.value == 'printf') {
+    if (currToken.value == 'printf') {
       printStatement();
+    }
+    else { //  if (currToken.value == 'int') {
+      declaration();
     }
   }
   else if (currToken.TYPE == TOKEN_TYPES.IDENTIFIER) {
@@ -230,8 +291,16 @@ function statement(): undefined {
 }
 
 function statementSequence(): undefined {
-  statement();
+
   let currToken = getCurrToken();
+  let lBracket = false;
+  if (currToken.TYPE == TOKEN_TYPES.LBRACKET) {
+    lBracket = true;
+    eatToken();
+  }
+
+  statement();
+  currToken = getCurrToken();
   while (currToken.TYPE == TOKEN_TYPES.SEMICOLON) {
     eatToken();
     currToken = getCurrToken();
@@ -241,9 +310,14 @@ function statementSequence(): undefined {
     statement();
     currToken = getCurrToken();
   }
+  if (lBracket && currToken.TYPE != TOKEN_TYPES.RBRACKET) {
+    console.error("Expecting Right, got: ", currToken.value, " instead");
+  }
+  else {
+    eatToken();
+  }
   console.log("PRINTING VT: ");
   printVT();
-
 }
 
 

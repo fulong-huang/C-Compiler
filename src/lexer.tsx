@@ -1,8 +1,11 @@
 import { createToken, TOKEN_TYPES } from "./token-type";
 import type { TOKEN } from "./token-type";
 
+
+let currLevel = 0;
+
 const KEYWORDS: Array<string> = [
-  "int", "return", "printf",
+  "int", "void", "return", "printf",
 ];
 
 
@@ -54,6 +57,14 @@ function getNextToken(): TOKEN {
     result = createToken(TOKEN_TYPES.RPAREN, ')');
     currIdx++;
   }
+  else if (currChar == '{') {
+    result = createToken(TOKEN_TYPES.LBRACKET, '{');
+    currIdx++;
+  }
+  else if (currChar == '}') {
+    result = createToken(TOKEN_TYPES.RBRACKET, '}');
+    currIdx++;
+  }
   else if (currChar == ',') {
     result = createToken(TOKEN_TYPES.COMMA, ',');
     currIdx++;
@@ -103,6 +114,7 @@ export default function lexer(content: string): Array<TOKEN> {
   const result: Array<TOKEN> = [];
   txt = content;
   console.log("\tINPUT: ");
+  currLevel = 0;
   console.log(txt);
   console.log("=====================");
   console.log();
