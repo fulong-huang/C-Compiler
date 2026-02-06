@@ -1,0 +1,9 @@
+int funcA(){
+    int a = 2; 
+    printf(a);
+  }
+int funcB(){
+    int b = 8; 
+    printf(b);
+  }
+

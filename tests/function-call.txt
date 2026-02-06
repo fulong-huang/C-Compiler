@@ -1,0 +1,12 @@
+void funcNoParam(){
+  int noParam = 0;
+  printf(noParam);
+}
+void funcTwoParams(int a, int b){
+  int twoParams = 0;
+  printf(twoParams);
+}
+
+funcNoParam();
+funcTwoParams(1, 2);
+

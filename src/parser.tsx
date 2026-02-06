@@ -1,12 +1,19 @@
 import { createToken, TOKEN_TYPES } from "./token-type"
 import type { TOKEN } from "./token-type";
-import { createParam, createVariable, getVT, insertVT, Param, printVT, Variable } from "./value-table";
+import { createParam, createVariable, getFunctionTable, getValueTable, insertFunctionTable, insertValueTable, Param, printVT, Variable } from "./value-table";
 
 let CURR_TOKENS: Array<TOKEN>;
 let CURR_TOKEN_IDX: number;
 
 const TYPES: Array<string> = ["int", "void"];
 
+function getNextToken(): TOKEN {
+  if (CURR_TOKEN_IDX + 1 >= CURR_TOKENS.length) {
+    console.error("EXPECTING TOKEN");
+    return createToken(TOKEN_TYPES.ERROR, "ERROR, EXPECTING TOKEN");
+  }
+  return CURR_TOKENS[CURR_TOKEN_IDX + 1];
+}
 function getCurrToken(): TOKEN {
   if (CURR_TOKEN_IDX >= CURR_TOKENS.length) {
     console.error("EXPECTING TOKEN");
@@ -79,8 +86,19 @@ function factor(): number {
   }
   else if (currToken.TYPE == TOKEN_TYPES.IDENTIFIER) {
     let ident: string = identifier();
-    let currVar: Variable = getVT(ident);
-    result = currVar.value;
+    currToken = getCurrToken();
+    if (currToken.TYPE == TOKEN_TYPES.LPAREN) {
+      let args = readArgs();
+      functionCall(ident, args);
+      // TODO: 
+      // Result needs to be return value
+      result = 999;
+    }
+    else {
+      console.error(currToken);
+      let currVar: Variable = getValueTable(ident);
+      result = currVar.value;
+    }
   }
   else {
     console.error("Expecting expression, got: ", currToken.value, " instead");
@@ -143,14 +161,48 @@ function expression(): number {
   }
   return lhs;
 }
+
+function functionCall(funcName: string, args: Array<number>): undefined {
+  let params: Array<Param> = getFunctionTable(funcName);
+  console.log("CALLING FUNCTION: ", funcName);
+  console.log("\tWITH ARGS: ", args);
+  console.log("PARAMS: ", params);
+}
 function functionDeclaration(funcName: string): undefined {
-  let currToken = getCurrToken();
   let params = param();
-  currToken = getCurrToken();
-  console.log("GOT FUNCTION: ", funcName);
-  console.log("PARANS: ", params);
+  let currToken = getCurrToken();
+  if (currToken.TYPE == TOKEN_TYPES.LBRACKET) {
+    statementSequence();
+    currToken = getCurrToken();
+    insertFunctionTable(funcName, params);
+  }
+  else {
+    console.log("====== Function Declaration ========");
+  }
 }
 
+function readArgs(): Array<number> {
+  let args: Array<number> = [];
+  let currToken: TOKEN = getCurrToken();
+  if (currToken.TYPE != TOKEN_TYPES.LPAREN) {
+    console.error("Expecting '(', got: ", currToken, " instead");
+  }
+  eatToken();
+
+  currToken = getCurrToken();
+  if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
+    args.push(factor());
+    currToken = getCurrToken();
+    while (currToken.TYPE == TOKEN_TYPES.COMMA) {
+      eatToken();
+      args.push(factor());
+      currToken = getCurrToken();
+    }
+  }
+  // eat ')'
+  eatToken();
+  return args;
+}
 function param(): Array<Param> {
   let params: Array<Param> = [];
   let currToken: TOKEN = getCurrToken();
@@ -163,7 +215,6 @@ function param(): Array<Param> {
   if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
     let paramType = typeName();
     let paramName = identifier();
-    console.log("PARAM: ", paramType, paramName);
     let currParam = createParam(paramName, paramType);
     params.push(currParam);
     currToken = getCurrToken();
@@ -188,10 +239,6 @@ function declaration(): undefined {
   // example: 
   //  int x = 3;
   let currToken = getCurrToken();
-  if (currToken.value != 'int') {
-    // Since this is only supported type as of now
-    console.error("Expecting integer, got: ", currToken.TYPE);
-  }
   eatToken();
   let ident = identifier();
 
@@ -199,15 +246,14 @@ function declaration(): undefined {
   if (currToken.TYPE == TOKEN_TYPES.SEMICOLON) {
     // Variable declared but not defined;
     let variable: Variable = createVariable(0, false);
-    insertVT(ident, variable);
-    console.log("end of statement");
+    insertValueTable(ident, variable);
   }
   else if (currToken.TYPE == TOKEN_TYPES.ASSIGNMENT) {
     // Got assignment char, now evaluate expression;
     eatToken();
     let value: number = expression();
     let variable: Variable = createVariable(value, false);
-    insertVT(ident, variable);
+    insertValueTable(ident, variable);
   }
   else if (currToken.TYPE == TOKEN_TYPES.LPAREN) {
     functionDeclaration(ident);
@@ -238,7 +284,7 @@ function assignment(): undefined {
   // Got assignment char, now evaluate expression;
   let value: number = expression();
   let variable: Variable = createVariable(value, false);
-  insertVT(ident, variable);
+  insertValueTable(ident, variable);
 }
 
 function printStatement(): undefined {
@@ -283,7 +329,14 @@ function statement(): undefined {
     }
   }
   else if (currToken.TYPE == TOKEN_TYPES.IDENTIFIER) {
-    assignment();
+    if (getNextToken().TYPE == TOKEN_TYPES.LPAREN) {
+      eatToken();
+      let args = readArgs();
+      functionCall(currToken.value, args);
+    }
+    else {
+      assignment();
+    }
   }
   else {
     console.log("Expression result: ", expression());
@@ -304,20 +357,32 @@ function statementSequence(): undefined {
   while (currToken.TYPE == TOKEN_TYPES.SEMICOLON) {
     eatToken();
     currToken = getCurrToken();
+    if (currToken.TYPE == TOKEN_TYPES.RBRACKET) {
+      if (lBracket) {
+        // eatToken();
+
+        // SEMICOLON is not required after right bracket
+        //  It might still needs to continue statement sequence after bracket
+        //  since it might be an inner block;
+
+        // NOT SO GOOD SOLUTION:
+        //  change current token to SEMICOLON type as it return, 
+        //  to continue statement sequence while loop in upper level
+        currToken.TYPE = TOKEN_TYPES.SEMICOLON;
+        currToken.value = ';';
+        break;
+      }
+      else {
+        console.error("Expecting '}', got: ", currToken.value, " instead");
+      }
+      break;
+    }
     if (currToken.TYPE == TOKEN_TYPES.EOF) {
       break;
     }
     statement();
     currToken = getCurrToken();
   }
-  if (lBracket && currToken.TYPE != TOKEN_TYPES.RBRACKET) {
-    console.error("Expecting Right, got: ", currToken.value, " instead");
-  }
-  else {
-    eatToken();
-  }
-  console.log("PRINTING VT: ");
-  printVT();
 }
 
 
@@ -325,5 +390,8 @@ export default function parser(tokens: Array<TOKEN>) {
   CURR_TOKENS = tokens;
   CURR_TOKEN_IDX = 0;
   statementSequence();
+
+  console.log("PRINTING VT: ");
+  printVT();
 }
 

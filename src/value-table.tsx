@@ -1,5 +1,6 @@
-import { TOKEN_TYPES } from "./token-type";
-const VT: { [ident: string]: Variable; } = {};
+const VALUE_TABLE: { [ident: string]: Variable; } = {};
+const FUNCTION_TABLE: { [funcName: string]: Array<Param>; } = {};
+
 export interface Variable {
   value: number;
   inst: number;
@@ -31,18 +32,29 @@ export function createVariable(value: number, isInst: boolean): Variable {
   return result;
 }
 
-export function insertVT(ident: string, variable: Variable) {
-  VT[ident] = variable;
+export function insertValueTable(ident: string, variable: Variable) {
+  VALUE_TABLE[ident] = variable;
+}
+
+export function insertFunctionTable(funcName: string, params: Array<Param>) {
+  FUNCTION_TABLE[funcName] = params;
 }
 
 export function printVT() {
-  console.log(VT);
+  console.log(VALUE_TABLE);
 }
-export function getVT(ident: string): Variable {
-  let variable = VT[ident];
+export function getValueTable(ident: string): Variable {
+  let variable = VALUE_TABLE[ident];
   if (variable == undefined) {
     console.error("Variable ", ident, " not found");
   }
-  return VT[ident];
+  return variable;
+}
+export function getFunctionTable(funcName: string): Array<Param> {
+  let params = FUNCTION_TABLE[funcName];
+  if (params == undefined) {
+    console.error("Function ", funcName, " not found");
+  }
+  return params;
 }
 
