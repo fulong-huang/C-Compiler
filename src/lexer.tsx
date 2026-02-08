@@ -5,7 +5,7 @@ import type { TOKEN } from "./token-type";
 let currLevel = 0;
 
 const KEYWORDS: Array<string> = [
-  "int", "void", "return", "printf",
+  "int", "void", "return", "printf", "scanf",
 ];
 
 

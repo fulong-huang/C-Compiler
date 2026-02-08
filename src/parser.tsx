@@ -1,9 +1,10 @@
 import { createToken, TOKEN_TYPES } from "./token-type"
 import type { TOKEN } from "./token-type";
-import { createParam, createVariable, getFunctionTable, getValueTable, insertFunctionTable, insertValueTable, Param, printVT, Variable } from "./value-table";
+import { createParam, createVariable, getFunctionTable, getValueTable, insertFunctionTable, insertValueTable, Param, printVT, resetValueTable, Variable } from "./value-table";
 
 let CURR_TOKENS: Array<TOKEN>;
 let CURR_TOKEN_IDX: number;
+let INST_NUMBER: number = 0;
 
 const TYPES: Array<string> = ["int", "void"];
 
@@ -287,6 +288,34 @@ function assignment(): undefined {
   insertValueTable(ident, variable);
 }
 
+function scanfStatement(): undefined {
+  // TODO: 
+  // Use proper scanf grammar instead
+
+  // eat scanf token
+  eatToken();
+  let currToken: TOKEN = getCurrToken();
+  if (currToken.TYPE != TOKEN_TYPES.LPAREN) {
+    console.error("Expecting '(', got: ", currToken, " instead");
+  }
+  else {
+    eatToken();
+  }
+  // read arguments
+  let ident: string = identifier();
+  currToken = getCurrToken();
+  if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
+    console.error("Expecting ')', got: ", currToken, " instead");
+  }
+  else {
+    eatToken();
+  }
+  // TODO: 
+  // change it to actual instruction number
+  let variable = createVariable(INST_NUMBER++, true);
+  insertValueTable(ident, variable);
+}
+
 function printStatement(): undefined {
   // eat 'printf' token
   eatToken();
@@ -323,6 +352,9 @@ function statement(): undefined {
   if (currToken.TYPE == TOKEN_TYPES.KEYWORD) {
     if (currToken.value == 'printf') {
       printStatement();
+    }
+    else if (currToken.value == 'scanf') {
+      scanfStatement();
     }
     else { //  if (currToken.value == 'int') {
       declaration();
@@ -389,6 +421,8 @@ function statementSequence(): undefined {
 export default function parser(tokens: Array<TOKEN>) {
   CURR_TOKENS = tokens;
   CURR_TOKEN_IDX = 0;
+  resetValueTable();
+  INST_NUMBER = 0;
   statementSequence();
 
   console.log("PRINTING VT: ");

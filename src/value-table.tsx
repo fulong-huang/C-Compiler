@@ -1,4 +1,4 @@
-const VALUE_TABLE: { [ident: string]: Variable; } = {};
+let VALUE_TABLE: { [ident: string]: Variable; } = {};
 const FUNCTION_TABLE: { [funcName: string]: Array<Param>; } = {};
 
 export interface Variable {
@@ -34,6 +34,9 @@ export function createVariable(value: number, isInst: boolean): Variable {
 
 export function insertValueTable(ident: string, variable: Variable) {
   VALUE_TABLE[ident] = variable;
+}
+export function resetValueTable() {
+  VALUE_TABLE = {};
 }
 
 export function insertFunctionTable(funcName: string, params: Array<Param>) {

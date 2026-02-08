@@ -1,0 +1,7 @@
+int a = 0;
+int b = 0;
+int c = 0;
+scanf(a);
+scanf(b);
+scanf(c);
+
