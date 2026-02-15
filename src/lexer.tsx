@@ -112,7 +112,6 @@ export default function lexer(content: string): Array<TOKEN> {
   const result: Array<TOKEN> = [];
   txt = content;
   console.log("\tINPUT: ");
-  currLevel = 0;
   console.log(txt);
   console.log("=====================");
   console.log();
