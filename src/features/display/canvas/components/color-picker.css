@@ -1,0 +1,36 @@
+.color-picker {
+  margin-top: 60px;
+  text-align: center;
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px;
+}
+
+.color-picker>* {
+  width: 45px;
+  height: 45px;
+}
+
+.color-picker>*:hover {
+  outline: 3px solid gray;
+  cursor: pointer;
+}
+
+.color-picker>*:active {
+  outline-color: darkgray;
+}
+
+.color-picker>span {
+  width: 0;
+  height: 0;
+}
+
+.color-picker-selected {
+  outline: solid;
+  outline-width: 5px;
+  outline-color: gray;
+}
