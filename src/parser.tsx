@@ -32,10 +32,10 @@ function eatToken(): undefined {
 }
 
 function typeName(): string {
-  let currToken = getCurrToken();
+  const currToken = getCurrToken();
   eatToken();
   if (currToken.TYPE == TOKEN_TYPES.KEYWORD) {
-    let typeName = currToken.value;
+    const typeName = currToken.value;
     if (!TYPES.includes(typeName)) {
       console.error("Unknown Type Name: ", typeName);
     }
@@ -47,10 +47,10 @@ function typeName(): string {
 }
 
 function identifier(): string {
-  let currToken = getCurrToken();
+  const currToken = getCurrToken();
   eatToken();
   if (currToken.TYPE == TOKEN_TYPES.IDENTIFIER) {
-    let tokenValue = currToken.value;
+    const tokenValue = currToken.value;
     return tokenValue;
   }
   console.error("Expecting Identifier, got: ", currToken.value, " instead");
@@ -58,10 +58,10 @@ function identifier(): string {
 }
 
 function number(): number {
-  let currToken = getCurrToken();
+  const currToken = getCurrToken();
   eatToken();
   if (currToken.TYPE == TOKEN_TYPES.INTEGER) {
-    let tokenValue = currToken.value;
+    const tokenValue = currToken.value;
     return parseInt(tokenValue);
   }
   console.error("Expecting Integer, got: ", currToken.value, " instead");
@@ -86,10 +86,10 @@ function factor(): number {
     result = number();
   }
   else if (currToken.TYPE == TOKEN_TYPES.IDENTIFIER) {
-    let ident: string = identifier();
+    const ident: string = identifier();
     currToken = getCurrToken();
     if (currToken.TYPE == TOKEN_TYPES.LPAREN) {
-      let args = readArgs();
+      const args = readArgs();
       functionCall(ident, args);
       // TODO: 
       // Result needs to be return value
@@ -97,7 +97,7 @@ function factor(): number {
     }
     else {
       console.error(currToken);
-      let currVar: Variable = getValueTable(ident);
+      const currVar: Variable = getValueTable(ident);
       result = currVar.value;
     }
   }
@@ -118,7 +118,7 @@ function term(): number {
     (operator == '*' || operator == '/')
   ) {
     eatToken();
-    let rhs: number = factor();
+    const rhs: number = factor();
 
     if (operator == '*') {
       lhs *= rhs;
@@ -149,7 +149,7 @@ function expression(): number {
     (operator == '+' || operator == '-')
   ) {
     eatToken();
-    let rhs: number = term();
+    const rhs: number = term();
 
     if (operator == '+') {
       lhs += rhs;
@@ -164,13 +164,13 @@ function expression(): number {
 }
 
 function functionCall(funcName: string, args: Array<number>): undefined {
-  let params: Array<Param> = getFunctionTable(funcName);
+  const params: Array<Param> = getFunctionTable(funcName);
   console.log("CALLING FUNCTION: ", funcName);
   console.log("\tWITH ARGS: ", args);
   console.log("PARAMS: ", params);
 }
 function functionDeclaration(funcName: string): undefined {
-  let params = param();
+  const params = param();
   let currToken = getCurrToken();
   if (currToken.TYPE == TOKEN_TYPES.LBRACKET) {
     statementSequence();
@@ -183,7 +183,7 @@ function functionDeclaration(funcName: string): undefined {
 }
 
 function readArgs(): Array<number> {
-  let args: Array<number> = [];
+  const args: Array<number> = [];
   let currToken: TOKEN = getCurrToken();
   if (currToken.TYPE != TOKEN_TYPES.LPAREN) {
     console.error("Expecting '(', got: ", currToken, " instead");
@@ -205,7 +205,7 @@ function readArgs(): Array<number> {
   return args;
 }
 function param(): Array<Param> {
-  let params: Array<Param> = [];
+  const params: Array<Param> = [];
   let currToken: TOKEN = getCurrToken();
   if (currToken.TYPE != TOKEN_TYPES.LPAREN) {
     console.error("Expecting '(', got: ", currToken, " instead");
@@ -241,19 +241,19 @@ function declaration(): undefined {
   //  int x = 3;
   let currToken = getCurrToken();
   eatToken();
-  let ident = identifier();
+  const ident = identifier();
 
   currToken = getCurrToken();
   if (currToken.TYPE == TOKEN_TYPES.SEMICOLON) {
     // Variable declared but not defined;
-    let variable: Variable = createVariable(0, false);
+    const variable: Variable = createVariable(0, false);
     insertValueTable(ident, variable);
   }
   else if (currToken.TYPE == TOKEN_TYPES.ASSIGNMENT) {
     // Got assignment char, now evaluate expression;
     eatToken();
-    let value: number = expression();
-    let variable: Variable = createVariable(value, false);
+    const value: number = expression();
+    const variable: Variable = createVariable(value, false);
     insertValueTable(ident, variable);
   }
   else if (currToken.TYPE == TOKEN_TYPES.LPAREN) {
@@ -272,7 +272,7 @@ function assignment(): undefined {
     console.error("Expecting identifier, got: ", currToken.TYPE);
   }
 
-  let ident = identifier();
+  const ident = identifier();
 
   currToken = getCurrToken();
   if (currToken.TYPE != TOKEN_TYPES.ASSIGNMENT) {
@@ -283,8 +283,8 @@ function assignment(): undefined {
   currToken = getCurrToken();
 
   // Got assignment char, now evaluate expression;
-  let value: number = expression();
-  let variable: Variable = createVariable(value, false);
+  const value: number = expression();
+  const variable: Variable = createVariable(value, false);
   insertValueTable(ident, variable);
 }
 
@@ -302,7 +302,7 @@ function scanfStatement(): undefined {
     eatToken();
   }
   // read arguments
-  let ident: string = identifier();
+  const ident: string = identifier();
   currToken = getCurrToken();
   if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
     console.error("Expecting ')', got: ", currToken, " instead");
@@ -312,7 +312,7 @@ function scanfStatement(): undefined {
   }
   // TODO: 
   // change it to actual instruction number
-  let variable = createVariable(INST_NUMBER++, true);
+  const variable = createVariable(INST_NUMBER++, true);
   insertValueTable(ident, variable);
 }
 
@@ -327,7 +327,7 @@ function printStatement(): undefined {
   eatToken();
   currToken = getCurrToken();
   if (currToken.TYPE != TOKEN_TYPES.RPAREN) {
-    let args: Array<number> = [];
+    const args: Array<number> = [];
     args.push(expression());
     currToken = getCurrToken();
     while (currToken.TYPE == TOKEN_TYPES.COMMA) {
@@ -348,7 +348,7 @@ function printStatement(): undefined {
 }
 
 function statement(): undefined {
-  let currToken = getCurrToken();
+  const currToken = getCurrToken();
   if (currToken.TYPE == TOKEN_TYPES.KEYWORD) {
     if (currToken.value == 'printf') {
       printStatement();
@@ -363,7 +363,7 @@ function statement(): undefined {
   else if (currToken.TYPE == TOKEN_TYPES.IDENTIFIER) {
     if (getNextToken().TYPE == TOKEN_TYPES.LPAREN) {
       eatToken();
-      let args = readArgs();
+      const args = readArgs();
       functionCall(currToken.value, args);
     }
     else {

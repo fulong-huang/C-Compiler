@@ -2,8 +2,6 @@ import { createToken, TOKEN_TYPES } from "./token-type";
 import type { TOKEN } from "./token-type";
 
 
-let currLevel = 0;
-
 const KEYWORDS: Array<string> = [
   "int", "void", "return", "printf", "scanf",
 ];
@@ -82,11 +80,11 @@ function getNextToken(): TOKEN {
     //     }
   }
   else if (currChar >= '0' && currChar <= '9') {
-    let intStr = getInteger();
+    const intStr = getInteger();
     result = createToken(TOKEN_TYPES.INTEGER, intStr);
   }
   else if ((currChar >= 'a' && currChar <= 'z') || currChar >= 'A' && currChar <= 'Z') {
-    let ident = getIdentifier();
+    const ident = getIdentifier();
     if (KEYWORDS.includes(ident)) {
       result = createToken(TOKEN_TYPES.KEYWORD, ident);
     }

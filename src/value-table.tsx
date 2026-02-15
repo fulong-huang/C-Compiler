@@ -14,8 +14,7 @@ export interface Param {
 export function createParam(ident: string, type: string): Param {
   // TODO: 
   //  Param can not have void type
-  let result: Param;
-  result = { ident: ident, TYPE: type };
+  const result: Param = { ident: ident, TYPE: type };
   return result;
 }
 
@@ -47,14 +46,14 @@ export function printVT() {
   console.log(VALUE_TABLE);
 }
 export function getValueTable(ident: string): Variable {
-  let variable = VALUE_TABLE[ident];
+  const variable = VALUE_TABLE[ident];
   if (variable == undefined) {
     console.error("Variable ", ident, " not found");
   }
   return variable;
 }
 export function getFunctionTable(funcName: string): Array<Param> {
-  let params = FUNCTION_TABLE[funcName];
+  const params = FUNCTION_TABLE[funcName];
   if (params == undefined) {
     console.error("Function ", funcName, " not found");
   }
